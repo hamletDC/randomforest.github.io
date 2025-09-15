@@ -171,6 +171,13 @@
             background-clip: text;
         }
 
+        .iris-icon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .project-title {
             font-size: 2rem;
             font-weight: 700;
@@ -192,6 +199,12 @@
             border: 1px solid rgba(6, 182, 212, 0.3);
             position: relative;
             z-index: 1;
+        }
+
+        .project-type.educational {
+            background: rgba(236, 72, 153, 0.2);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
         }
 
         .project-description {
@@ -372,7 +385,7 @@
     </div>
 
     <div class="container">
-        <header>
+      <header>
             <h1 class="logo">ML PROJECT</h1>
             <p class="subtitle">Análisis de Random Forest</p>
             <p class="description">
@@ -442,6 +455,38 @@
                     <span class="tag">Supervivencia</span>
                     <span class="tag">Historia</span>
                     <span class="tag">Validación Cruzada</span>
+                </div>
+            </a>
+
+            <a href="random_forest_infographic.html" class="project-card">
+                <span class="project-icon iris-icon">🌸</span>
+                <h2 class="project-title">Random Forest Iris</h2>
+                <span class="project-type educational">Infografía Interactiva</span>
+                <p class="project-description">
+                    Infografía educativa completa sobre Random Forest aplicado al dataset clásico de Iris. 
+                    Explicación detallada del algoritmo, métricas y proceso paso a paso con elementos interactivos.
+                </p>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-value">150</span>
+                        <span class="stat-label">Muestras</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">96-98%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">120</span>
+                        <span class="stat-label">Estimadores</span>
+                    </div>
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Random Forest</span>
+                    <span class="tag">Iris Dataset</span>
+                    <span class="tag">Infografía</span>
+                    <span class="tag">Educativo</span>
+                    <span class="tag">Interactivo</span>
+                    <span class="tag">Clasificación</span>
                 </div>
             </a>
         </main>
@@ -549,17 +594,4 @@
 
         techObserver.observe(document.querySelector('.tech-stack'));
 
-        // Add slide up animation keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInUp {
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
-</body>
-</html>
+        // Add slide up animation key
