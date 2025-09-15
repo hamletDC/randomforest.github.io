@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 60%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 80px 0 60px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.3)); }
+            50% { filter: drop-shadow(0 0 40px rgba(6, 182, 212, 0.6)); }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .description {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            opacity: 0.9;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            padding: 60px 0;
+        }
+
+        .project-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid #334155;
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #06b6d4;
+            box-shadow: 0 25px 50px rgba(6, 182, 212, 0.2);
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, #06b6d4, transparent);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-card:hover::after {
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .project-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .random-forest-icon {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .decision-tree-icon {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #f1f5f9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-type {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.2);
+            color: #22d3ee;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-description {
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #22d3ee;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag {
+            background: rgba(15, 23, 42, 0.8);
+            color: #cbd5e1;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid #334155;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 24px;
+            margin: 40px 0;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 500px;
+            margin: 0 auto 40px;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid #334155;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            border-color: #06b6d4;
+            transform: translateY(-2px);
+        }
+
+        .tech-icon {
+            font-size: 1.5rem;
+        }
+
+        .tech-name {
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid #334155;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 40px 0;
+            }
+
+            .project-card {
+                padding: 30px 25px;
+            }
+
+            .project-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .tech-stack {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            header {
+                padding: 60px 0 40px;
+            }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-shape:nth-child(2) { top: 60%; left: 80%; animation-delay: 2s; }
+        .floating-shape:nth-child(3) { top: 80%; left: 20%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-shape" style="font-size: 3rem;">🌲</div>
+        <div class="floating-shape" style="font-size: 2.5rem;">🎯</div>
+        <div class="floating-shape" style="font-size: 3.5rem;">📊</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 class="logo">ML Portfolio</h1>
+            <p class="subtitle">Análisis Avanzado con Machine Learning</p>
+            <p class="description">
+                Explora dos proyectos completos de ciencia de datos aplicando algoritmos de machine learning 
+                a problemas reales con datasets reconocidos mundialmente.
+            </p>
+        </header>
+
+        <main class="projects-grid">
+            <a href="RandomForesComparacion.html" class="project-card">
+                <span class="project-icon random-forest-icon">🌲</span>
+                <h2 class="project-title">Random Forest</h2>
+                <span class="project-type">Detección de Fraude</span>
+                <p class="project-description">
+                    Análisis completo del algoritmo Random Forest aplicado a la detección de fraude en tarjetas 
+                    de crédito. Comparación entre clasificación y regresión con métricas detalladas y visualizaciones interactivas.
+                </p>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-value">284K+</span>
+                        <span class="stat-label">Transacciones</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">0.85+</span>
+                        <span class="stat-label">ROC-AUC</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">200</span>
+                        <span class="stat-label">Estimadores</span>
+                    </div>
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Random Forest</span>
+                    <span class="tag">Clasificación</span>
+                    <span class="tag">Regresión</span>
+                    <span class="tag">Fraude</span>
+                    <span class="tag">ROC-AUC</span>
+                    <span class="tag">Datos Desbalanceados</span>
+                </div>
+            </a>
+
+            <a href="IA-Arbol-Decision.html" class="project-card">
+                <span class="project-icon decision-tree-icon">🚢</span>
+                <h2 class="project-title">Decision Tree</h2>
+                <span class="project-type">Análisis Titanic</span>
+                <p class="project-description">
+                    Dashboard interactivo que analiza la supervivencia de pasajeros del Titanic usando árboles de decisión. 
+                    Métricas avanzadas, visualizaciones dinámicas y insights históricos profundos.
+                </p>
+                <div class="project-stats">
+                    <div class="stat">
+                        <span class="stat-value">891</span>
+                        <span class="stat-label">Pasajeros</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">78.7%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">83.2%</span>
+                        <span class="stat-label">AUC-ROC</span>
+                    </div>
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Decision Tree</span>
+                    <span class="tag">Titanic</span>
+                    <span class="tag">Clasificación</span>
+                    <span class="tag">Supervivencia</span>
+                    <span class="tag">Historia</span>
+                    <span class="tag">Validación Cruzada</span>
+                </div>
+            </a>
+        </main>
+
+        <section class="cta-section">
+            <h2 class="cta-title">Tecnologías Utilizadas</h2>
+            <p class="cta-description">
+                Proyectos desarrollados con las mejores prácticas de ciencia de datos y machine learning
+            </p>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <span class="tech-icon">🐍</span>
+                    <span class="tech-name">Python</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">📊</span>
+                    <span class="tech-name">Scikit-learn</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🐼</span>
+                    <span class="tech-name">Pandas</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">📈</span>
+                    <span class="tech-name">Matplotlib</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🌊</span>
+                    <span class="tech-name">Seaborn</span>
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🎯</span>
+                    <span class="tech-name">Machine Learning</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Machine Learning Portfolio - Análisis Avanzado de Datos</p>
+    </footer>
+
+    <script>
+        // Animate cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'slideInUp 0.8s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            observer.observe(card);
+        });
+
+        // Add hover sound effect simulation
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.boxShadow = '0 30px 60px rgba(6, 182, 212, 0.3)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = '';
+            });
+        });
+
+        // Parallax effect for floating elements
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const shapes = document.querySelectorAll('.floating-shape');
+            shapes.forEach((shape, index) => {
+                const speed = 0.5 + (index * 0.1);
+                shape.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+
+        // Animate tech stack on scroll
+        const techObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const items = entry.target.querySelectorAll('.tech-item');
+                    items.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.tech-item').forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'all 0.5s ease';
+        });
+
+        techObserver.observe(document.querySelector('.tech-stack'));
+
+        // Add slide up animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInUp {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

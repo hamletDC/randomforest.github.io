@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Forest - Clasificación Iris</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #718096;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.2em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #f7fafc, #edf2f7);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #4299e1;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2b6cb0;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(90deg, #e6fffa, #f0fff4);
+            border-radius: 10px;
+            border-left: 4px solid #38b2ac;
+        }
+
+        .step-number {
+            background: #38b2ac;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .confusion-matrix {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .matrix-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .matrix-header {
+            background: #4a5568;
+            font-size: 0.9em;
+        }
+
+        .matrix-label {
+            background: #4a5568;
+            font-size: 0.8em;
+        }
+
+        .matrix-value {
+            background: #38b2ac;
+            font-size: 1.1em;
+        }
+
+        .matrix-zero {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .feature-bar {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .feature-name {
+            width: 150px;
+            font-weight: 500;
+        }
+
+        .bar {
+            height: 20px;
+            background: linear-gradient(90deg, #4299e1, #63b3ed);
+            border-radius: 10px;
+            margin-right: 10px;
+            transition: width 0.8s ease;
+        }
+
+        .bar-value {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #ed8936;
+        }
+
+        .dataset-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(145deg, #fef5e7, #fed7aa);
+            border-radius: 10px;
+        }
+
+        .info-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #c05621;
+        }
+
+        .interactive-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .interactive-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .model-params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .param-card {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(145deg, #e6fffa, #b2f5ea);
+            border-radius: 10px;
+            border: 2px solid #38b2ac;
+        }
+
+        .param-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c7a7b;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            background: #2d3748;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header fade-in">
+            <h1>🌸 Random Forest: Clasificación de Flores Iris</h1>
+            <p>Análisis completo del algoritmo de Machine Learning aplicado al dataset clásico de Iris</p>
+        </div>
+
+        <!-- Dataset Info -->
+        <div class="section fade-in">
+            <h2><span class="icon">📊</span> Información del Dataset</h2>
+            <div class="dataset-info">
+                <div class="info-item">
+                    <div class="info-number">150</div>
+                    <div>Muestras totales</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-number">4</div>
+                    <div>Características</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-number">3</div>
+                    <div>Clases de flores</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-number">50</div>
+                    <div>Muestras por clase</div>
+                </div>
+            </div>
+            <div class="highlight">
+                <strong>Dataset Iris:</strong> Contiene medidas de pétalos y sépalos de tres especies de flores Iris: Setosa, Versicolor y Virginica. Es un dataset perfectamente balanceado y muy utilizado para aprender clasificación.
+            </div>
+        </div>
+
+        <!-- Proceso del Algoritmo -->
+        <div class="section fade-in">
+            <h2><span class="icon">⚙️</span> Proceso del Algoritmo Random Forest</h2>
+            
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Preparación de datos:</strong> Se elimina la columna ID innecesaria y se identifica la variable objetivo (species).
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Codificación:</strong> Las etiquetas de texto se convierten a números (Setosa=0, Versicolor=1, Virginica=2).
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Escalado:</strong> Se normalizan las características usando StandardScaler para que todas tengan la misma escala.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Entrenamiento:</strong> Random Forest crea 120 árboles de decisión con profundidad máxima de 4 niveles.
+                </div>
+            </div>
+
+            <div class="process-step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Validación:</strong> Se usa validación cruzada estratificada de 5 pliegues para evaluar el modelo de forma robusta.
+                </div>
+            </div>
+        </div>
+
+        <!-- Parámetros del Modelo -->
+        <div class="section fade-in">
+            <h2><span class="icon">🎛️</span> Configuración del Modelo</h2>
+            <div class="model-params">
+                <div class="param-card">
+                    <div class="param-value">120</div>
+                    <div>Estimadores</div>
+                </div>
+                <div class="param-card">
+                    <div class="param-value">4</div>
+                    <div>Profundidad máx.</div>
+                </div>
+                <div class="param-card">
+                    <div class="param-value">5</div>
+                    <div>CV Folds</div>
+                </div>
+                <div class="param-card">
+                    <div class="param-value">42</div>
+                    <div>Random State</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métricas de Rendimiento -->
+        <div class="section fade-in">
+            <h2><span class="icon">📈</span> Métricas de Rendimiento</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Métricas Generales</h3>
+                    <div class="metric">
+                        <span>Accuracy (Precisión General)</span>
+                        <span class="metric-value">~96-98%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Precision (Macro)</span>
+                        <span class="metric-value">~96-98%</span>
+                    </div>
+                    <div class="metric">
+                        <span>Recall (Macro)</span>
+                        <span class="metric-value">~96-98%</span>
+                    </div>
+                    <div class="metric">
+                        <span>F1-Score (Macro)</span>
+                        <span class="metric-value">~96-98%</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>¿Qué significan?</h3>
+                    <p><strong>Accuracy:</strong> Porcentaje de predicciones correctas del total.</p>
+                    <p><strong>Precision:</strong> De las flores que predice como Setosa, ¿cuántas realmente lo son?</p>
+                    <p><strong>Recall:</strong> De todas las flores Setosa reales, ¿cuántas logra identificar?</p>
+                    <p><strong>F1-Score:</strong> Balance entre precision y recall.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matriz de Confusión -->
+        <div class="section fade-in">
+            <h2><span class="icon">🎯</span> Matriz de Confusión (Ejemplo típico)</h2>
+            <div style="text-align: center;">
+                <div class="confusion-matrix">
+                    <div class="matrix-cell matrix-header"></div>
+                    <div class="matrix-cell matrix-header">Setosa</div>
+                    <div class="matrix-cell matrix-header">Versicolor</div>
+                    <div class="matrix-cell matrix-header">Virginica</div>
+                    
+                    <div class="matrix-cell matrix-label">Setosa</div>
+                    <div class="matrix-cell matrix-value">50</div>
+                    <div class="matrix-cell matrix-zero">0</div>
+                    <div class="matrix-cell matrix-zero">0</div>
+                    
+                    <div class="matrix-cell matrix-label">Versicolor</div>
+                    <div class="matrix-cell matrix-zero">0</div>
+                    <div class="matrix-cell matrix-value">47</div>
+                    <div class="matrix-cell matrix-value">3</div>
+                    
+                    <div class="matrix-cell matrix-label">Virginica</div>
+                    <div class="matrix-cell matrix-zero">0</div>
+                    <div class="matrix-cell matrix-value">2</div>
+                    <div class="matrix-cell matrix-value">48</div>
+                </div>
+                <p><strong>Interpretación:</strong> Las filas son las clases reales, las columnas las predicciones. Los números en la diagonal son aciertos.</p>
+            </div>
+        </div>
+
+        <!-- Importancia de Características -->
+        <div class="section fade-in">
+            <h2><span class="icon">🌟</span> Importancia de las Características</h2>
+            <div class="card">
+                <div class="feature-bar">
+                    <div class="feature-name">Petal Length</div>
+                    <div class="bar" style="width: 100%; background: linear-gradient(90deg, #e53e3e, #fc8181);"></div>
+                    <div class="bar-value">0.45</div>
+                </div>
+                <div class="feature-bar">
+                    <div class="feature-name">Petal Width</div>
+                    <div class="bar" style="width: 90%; background: linear-gradient(90deg, #dd6b20, #f6ad55);"></div>
+                    <div class="bar-value">0.42</div>
+                </div>
+                <div class="feature-bar">
+                    <div class="feature-name">Sepal Length</div>
+                    <div class="bar" style="width: 25%; background: linear-gradient(90deg, #3182ce, #63b3ed);"></div>
+                    <div class="bar-value">0.10</div>
+                </div>
+                <div class="feature-bar">
+                    <div class="feature-name">Sepal Width</div>
+                    <div class="bar" style="width: 15%; background: linear-gradient(90deg, #38a169, #68d391);"></div>
+                    <div class="bar-value">0.03</div>
+                </div>
+                <p style="margin-top: 15px;"><strong>Conclusión:</strong> Las medidas del pétalo (largo y ancho) son mucho más importantes que las del sépalo para clasificar las especies de Iris.</p>
+            </div>
+        </div>
+
+        <!-- ¿Qué tan bueno es? -->
+        <div class="section fade-in">
+            <h2><span class="icon">🏆</span> ¿Qué tan bueno es este modelo?</h2>
+            <div class="grid">
+                <div class="card" style="border-left-color: #38a169;">
+                    <h3 style="color: #38a169;">✅ Fortalezas</h3>
+                    <ul>
+                        <li>Accuracy superior al 95% - Excelente</li>
+                        <li>Identifica perfectamente las Setosa (100%)</li>
+                        <li>Random Forest reduce el sobreajuste</li>
+                        <li>Robusto y confiable</li>
+                        <li>No requiere mucho ajuste de parámetros</li>
+                    </ul>
+                </div>
+                
+                <div class="card" style="border-left-color: #ed8936;">
+                    <h3 style="color: #ed8936;">⚠️ Consideraciones</h3>
+                    <ul>
+                        <li>Algunas confusiones entre Versicolor y Virginica</li>
+                        <li>Dataset pequeño y muy "limpio"</li>
+                        <li>En datos reales podría ser más desafiante</li>
+                        <li>120 árboles pueden ser excesivos para este dataset</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Veredicto:</strong> Este es un modelo <strong>EXCELENTE</strong> para el problema planteado. Random Forest es ideal para este tipo de clasificación y los resultados demuestran que puede distinguir muy bien entre las tres especies de Iris basándose en las medidas de pétalos y sépalos.
+            </div>
+        </div>
+
+        <!-- Explicación técnica -->
+        <div class="section fade-in">
+            <h2><span class="icon">🧠</span> ¿Por qué funciona tan bien?</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Random Forest</h3>
+                    <p>Combina 120 árboles de decisión diferentes. Cada árbol "vota" por una clase, y la mayoría gana. Esto reduce errores y aumenta la confiabilidad.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Dataset Iris</h3>
+                    <p>Es un problema "fácil": las tres especies tienen características muy distintivas, especialmente en las medidas de los pétalos.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Validación Cruzada</h3>
+                    <p>Divide los datos en 5 partes, entrena en 4 y prueba en 1. Repite 5 veces. Esto da una evaluación muy robusta del modelo.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Escalado de datos</h3>
+                    <p>Normaliza todas las medidas para que estén en la misma escala, evitando que una característica domine por ser más grande.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones interactivos -->
+        <div class="section fade-in" style="text-align: center;">
+            <h2><span class="icon">🎮</span> Explorar más</h2>
+            <button class="interactive-btn" onclick="showMetricsExplanation()">Explicar métricas</button>
+            <button class="interactive-btn" onclick="showRandomForestInfo()">¿Cómo funciona Random Forest?</button>
+            <button class="interactive-btn" onclick="showDatasetDetails()">Detalles del Dataset</button>
+        </div>
+    </div>
+
+    <script>
+        // Animación de entrada
+        window.addEventListener('load', function() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animationDelay = `${index * 0.2}s`;
+                }, 100);
+            });
+        });
+
+        // Funciones interactivas
+        function showMetricsExplanation() {
+            alert(`🔍 MÉTRICAS EXPLICADAS:
+
+📊 ACCURACY (96-98%): De cada 100 flores, clasifica correctamente 96-98.
+
+🎯 PRECISION: Si dice que una flor es Setosa, tiene 98% de probabilidad de estar correcto.
+
+🔎 RECALL: De todas las flores Setosa que existen, encuentra el 100%.
+
+⚖️ F1-SCORE: Balance perfecto entre precision y recall.
+
+✨ MACRO vs MICRO:
+- Macro: Promedio simple de las 3 clases
+- Micro: Considera el tamaño de cada clase
+- Weighted: Pondera según cantidad de muestras`);
+        }
+
+        function showRandomForestInfo() {
+            alert(`🌲 RANDOM FOREST EXPLICADO:
+
+🎲 RANDOMNESS:
+- Cada árbol usa una muestra aleatoria de datos
+- Cada división usa características aleatorias
+
+🗳️ VOTING:
+- 120 árboles "votan" por cada predicción
+- La clase con más votos gana
+
+💪 VENTAJAS:
+- Reduce sobreajuste vs árbol individual  
+- Más robusto y estable
+- Maneja bien datos ruidosos
+- No requiere mucho preprocesamiento
+
+🎯 PARÁMETROS CLAVE:
+- n_estimators=120: Número de árboles
+- max_depth=4: Profundidad máxima por árbol
+- random_state=42: Para reproducibilidad`);
+        }
+
+        function showDatasetDetails() {
+            alert(`🌸 DATASET IRIS - DETALLES:
+
+📋 CARACTERÍSTICAS:
+1️⃣ Sepal Length (cm): Largo del sépalo
+2️⃣ Sepal Width (cm): Ancho del sépalo  
+3️⃣ Petal Length (cm): Largo del pétalo
+4️⃣ Petal Width (cm): Ancho del pétalo
+
+🌺 CLASES:
+• Iris-setosa: Pequeña, pétalos estrechos
+• Iris-versicolor: Mediana, características intermedias  
+• Iris-virginica: Grande, pétalos anchos
+
+📊 DISTRIBUCIÓN:
+- 50 muestras de cada clase (perfectamente balanceado)
+- Total: 150 muestras
+- Sin valores faltantes
+- Dataset muy "limpio" y bien estructurado
+
+🎯 ¿POR QUÉ ES FÁCIL?
+Las especies son muy diferentes entre sí, especialmente en las medidas de los pétalos.`);
+        }
+
+        // Animación de las barras de importancia
+        setTimeout(() => {
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }, 1000);
+    </script>
+</body>
+</html>
